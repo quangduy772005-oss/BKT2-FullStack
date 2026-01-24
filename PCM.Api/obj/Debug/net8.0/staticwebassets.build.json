@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "0VlHPu8HtCVVlJ7LcA3JJTezKMflR1+6Umj9/408bxQ=",
+  "Source": "PCM.Api",
+  "BasePath": "_content/PCM.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
