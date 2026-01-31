@@ -1,19 +1,11 @@
 import api from "./api";
 
 export interface Member {
-  id?: number;
+  id: number;
   fullName: string;
   email: string;
-  joinDate: string;
-  clubId: number;
 }
 
-// ✅ User + Admin
-export const getMembers = () => {
-  return api.get("/MembersApi");
-};
-
-// ❌ Chỉ Admin
-export const createMember = (member: Member) => {
-  return api.post("/MembersApi", member);
+export const getMembers = async () => {
+  return api.get<Member[]>("/members");
 };

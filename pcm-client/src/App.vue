@@ -1,16 +1,41 @@
-<script setup lang="ts">
-import TestAuth from "./views/TestAuth.vue";
-</script>
-
 <template>
-  <div style="padding: 20px">
-    <h1>🔐 Test JWT Authorization</h1>
-    <TestAuth />
+  <div class="app">
+    <Navbar v-if="showNavbar" />
+    <router-view />
   </div>
 </template>
 
-<style scoped>
-h1 {
-  margin-bottom: 16px;
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import Navbar from "./components/Navbar.vue";
+
+const route = useRoute();
+
+const showNavbar = computed(() => {
+  return route.path !== "/login";
+});
+</script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+#app {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 </style>

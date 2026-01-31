@@ -1,0 +1,16 @@
+c:\HOCTAP\Fullstack\PCM\PCM.Core\bin\Debug\net8.0\PCM.Core.deps.json
+c:\HOCTAP\Fullstack\PCM\PCM.Core\bin\Debug\net8.0\PCM.Core.dll
+c:\HOCTAP\Fullstack\PCM\PCM.Core\bin\Debug\net8.0\PCM.Core.pdb
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.csproj.AssemblyReference.cache
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.GeneratedMSBuildEditorConfig.editorconfig
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.AssemblyInfoInputs.cache
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.AssemblyInfo.cs
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.csproj.CoreCompileInputs.cache
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.sourcelink.json
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.dll
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\refint\PCM.Core.dll
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\PCM.Core.pdb
+c:\HOCTAP\Fullstack\PCM\PCM.Core\obj\Debug\net8.0\ref\PCM.Core.dll
+c:\HOCTAP\Fullstack\PCM\PCM.Api\bin_temp\PCM.Core.deps.json
+c:\HOCTAP\Fullstack\PCM\PCM.Api\bin_temp\PCM.Core.dll
+c:\HOCTAP\Fullstack\PCM\PCM.Api\bin_temp\PCM.Core.pdb

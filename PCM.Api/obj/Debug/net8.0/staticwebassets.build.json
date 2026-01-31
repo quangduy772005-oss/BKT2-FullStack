@@ -1,12 +1,1 @@
-{
-  "Version": 1,
-  "Hash": "0VlHPu8HtCVVlJ7LcA3JJTezKMflR1+6Umj9/408bxQ=",
-  "Source": "PCM.Api",
-  "BasePath": "_content/PCM.Api",
-  "Mode": "Default",
-  "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": [],
-  "Endpoints": []
-}
+{"Version":1,"Hash":"HYNhYQ+9sIefv1lO/oMFx+e5YfnIbahdYyQsGZfEiTw=","Source":"PCM.Api","BasePath":"/","Mode":"Root","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}

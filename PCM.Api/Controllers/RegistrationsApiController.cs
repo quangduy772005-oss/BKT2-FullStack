@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PCM.Api.Data;
-using PCM.Api.Models;
+using PCM.Core.Entities;
+using PCM.Infrastructure.Persistence;
 
 namespace PCM.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api/registrations")] // Corrected route
     [ApiController]
     public class RegistrationsApiController : ControllerBase
     {
@@ -16,21 +18,22 @@ namespace PCM.Api.Controllers
             _context = context;
         }
 
-        // GET: api/RegistrationsApi
+        // GET: api/registrations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Registration>>> GetRegistrations()
         {
             return await _context.Registrations
+                .AsNoTracking()
                 .Include(r => r.Member)
                 .Include(r => r.Activity)
                 .ToListAsync();
         }
 
-        // POST: api/RegistrationsApi
+        // POST: api/registrations
         [HttpPost]
         public async Task<ActionResult<Registration>> PostRegistration(Registration registration)
         {
-            // ❌ Chặn đăng ký trùng
+            // ❌ Stop duplicate registrations
             var exists = await _context.Registrations.AnyAsync(r =>
                 r.MemberId == registration.MemberId &&
                 r.ActivityId == registration.ActivityId);
@@ -40,7 +43,7 @@ namespace PCM.Api.Controllers
                 return BadRequest("Member đã đăng ký Activity này rồi.");
             }
 
-            registration.RegisteredAt = DateTime.Now;
+            registration.RegisteredAt = DateTime.UtcNow;
 
             _context.Registrations.Add(registration);
             await _context.SaveChangesAsync();

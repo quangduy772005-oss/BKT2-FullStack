@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PCM.Api.Data;
-using PCM.Api.Models;
+using PCM.Core.Entities;
+using PCM.Infrastructure.Persistence;
 
 namespace PCM.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api/activities")] // Corrected route
     [ApiController]
     public class ActivitiesApiController : ControllerBase
     {
@@ -16,21 +18,22 @@ namespace PCM.Api.Controllers
             _context = context;
         }
 
-        // GET: api/ActivitiesApi
+        // GET: api/activities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Activity>>> GetActivities()
         {
             return await _context.Activities
+                .AsNoTracking()
                 .Include(a => a.Club)
                 .ToListAsync();
         }
-
-        // GET: api/ActivitiesApi/5
+        // GET: api/activities/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivity(int id)
         {
             var activity = await _context.Activities
                 .Include(a => a.Club)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (activity == null)

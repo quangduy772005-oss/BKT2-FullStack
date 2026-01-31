@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<Member> Members => Set<Member>();
     public DbSet<Activity> Activities => Set<Activity>();
     public DbSet<Registration> Registrations => Set<Registration>();
+    public DbSet<User> Users => Set<User>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

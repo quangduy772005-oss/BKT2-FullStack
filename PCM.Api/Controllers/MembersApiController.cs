@@ -1,44 +1,41 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PCM.Api.Data;
-using PCM.Api.Models;
+using PCM.Core.Entities;
+using PCM.Infrastructure.Persistence;
 
 namespace PCM.Api.Controllers
 {
-    [Authorize] // 🔐 BẮT BUỘC ĐĂNG NHẬP
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api/members")] // Corrected route
     [ApiController]
     public class MembersApiController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public MembersApiController(AppDbContext context)
+        public MembersApiController(AppDbContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // =========================
-        // GET: api/MembersApi
-        // User + Admin đều xem được
-        // =========================
+        // GET: api/members
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Member>>> GetMembers()
         {
             return await _context.Members
-                .Include(m => m.Club)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-        // =========================
-        // GET: api/MembersApi/5
-        // User + Admin
-        // =========================
+        // GET: api/members/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Member>> GetMember(int id)
         {
             var member = await _context.Members
-                .Include(m => m.Club)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (member == null)
@@ -47,54 +44,62 @@ namespace PCM.Api.Controllers
             return member;
         }
 
-        // =========================
-        // POST: api/MembersApi
-        // CHỈ ADMIN
-        // =========================
+        // POST: api/members
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Member>> PostMember(Member member)
+        public async Task<ActionResult<Member>> PostMember([FromBody] MemberCreateDto memberDto)
         {
-            _context.Members.Add(member);
-            await _context.SaveChangesAsync();
+            if (string.IsNullOrWhiteSpace(memberDto.Email))
+                return BadRequest(new { message = "Email không được để trống" });
 
-            return Ok(member);
-            // Nếu muốn chuẩn REST:
-            // return CreatedAtAction(nameof(GetMember), new { id = member.Id }, member);
-        }
-
-        // =========================
-        // PUT: api/MembersApi/5
-        // CHỈ ADMIN
-        // =========================
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMember(int id, Member member)
-        {
-            if (id != member.Id)
-                return BadRequest();
-
-            _context.Entry(member).State = EntityState.Modified;
-
+            // Using transaction to ensure both User and Member are created
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Members.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
-            }
+                // 1. Create Identity User
+                var user = new AppUser
+                {
+                    UserName = memberDto.Email,
+                    Email = memberDto.Email,
+                    FirstName = memberDto.FullName.Split(' ', 2)[0],
+                    LastName = memberDto.FullName.Contains(' ') ? memberDto.FullName.Substring(memberDto.FullName.IndexOf(' ') + 1) : "",
+                    IsActive = true
+                };
 
-            return NoContent();
+                var userResult = await _userManager.CreateAsync(user, "Member@123"); // Default password
+                if (!userResult.Succeeded)
+                {
+                    var errors = string.Join(". ", userResult.Errors.Select(e => e.Description));
+                    return BadRequest(new { message = errors });
+                }
+
+                await _userManager.AddToRoleAsync(user, "Member");
+
+                // 2. Create Member entity
+                var member = new Member
+                {
+                    UserId = user.Id,
+                    FullName = memberDto.FullName,
+                    Email = memberDto.Email,
+                    PhoneNumber = memberDto.PhoneNumber,
+                    JoinDate = DateTime.UtcNow
+                };
+
+                _context.Members.Add(member);
+                await _context.SaveChangesAsync();
+                
+                await transaction.CommitAsync();
+
+                return Ok(member);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { message = "Đã xảy ra lỗi hệ thống: " + ex.Message });
+            }
         }
 
-        // =========================
-        // DELETE: api/MembersApi/5
-        // CHỈ ADMIN
-        // =========================
+        // DELETE: api/members/5
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMember(int id)
@@ -103,10 +108,19 @@ namespace PCM.Api.Controllers
             if (member == null)
                 return NotFound();
 
+            // Note: We might want to also delete the Identity user, 
+            // but for safety we'll just remove the member record or deactivate.
             _context.Members.Remove(member);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+    }
+
+    public class MemberCreateDto
+    {
+        public string FullName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string? PhoneNumber { get; set; }
     }
 }
